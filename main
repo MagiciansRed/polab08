@@ -1,7 +1,7 @@
-// polab06.cpp : Defines the entry point for the console application.
+// polab08.cpp : Ten plik zawiera funkcję „main”. W nim rozpoczyna się i kończy wykonywanie programu.
 //
 
-#include "stdafx.h"
+#include "pch.h"
 #include <string>
 #include <vector>
 #include <iostream>
@@ -11,32 +11,34 @@
 #include <filesystem>
 #include <algorithm>
 
+template<class T>
 class Matrix
 {
 public:
 	Matrix(int rows, int columns);
 	Matrix(std::string filename);
-	void addNumber(int value);
-	void changeSelectedCell(int row, int column, double newValue);
+	void addNumber(T value);
+	void changeSelectedCell(int row, int column, T newValue);
 	std::string getSelectedCell(int row, int column);
 	std::string getRow(int row);
 	std::string getColumn(int column);
 	std::string getMatrix();
 	void writeMatrixToFile(std::string FileName);
 	void transposition();
-	Matrix addMatrices(Matrix a, Matrix b);
-	Matrix subtractMatrices(Matrix a, Matrix b);
-	Matrix multiplyMatrixes(Matrix, Matrix);
-	Matrix addthem(Matrix, Matrix);
-	Matrix subtractThem(Matrix, Matrix);
-	Matrix multiplyThem(Matrix, Matrix);
+	Matrix<T> addMatrices(Matrix<T> a, Matrix<T> b);
+	Matrix<T> subtractMatrices(Matrix<T> a, Matrix<T> b);
+	Matrix<T> multiplyMatrixes(Matrix<T>, Matrix<T>);
+	Matrix<T> addthem(Matrix<T>, Matrix<T>);
+	Matrix<T> subtractThem(Matrix<T>, Matrix<T>);
+	Matrix<T> multiplyThem(Matrix<T>, Matrix<T>);
 	friend void swap(Matrix& first, Matrix& second)
 	{
-		std::swap(first.columns, second.columns);
-		std::swap(first.rows, second.rows);
-		std::swap(first.data, second.data);
+		using std::swap;
+		swap(first.columns, second.columns);
+		swap(first.rows, second.rows);
+		swap(first.data, second.data);
 	}
-	
+
 	friend Matrix operator+(const Matrix& one, const Matrix& two)
 	{
 		Matrix result(one.rows, one.columns);
@@ -64,7 +66,7 @@ public:
 	}
 	Matrix& operator=(Matrix source)
 	{
-		std::swap(*this, source);
+		swap(*this, source);
 		return *this;
 	}
 private:
@@ -74,23 +76,8 @@ private:
 };
 
 
-
-
-class Matrix Matrix::multiplyThem(Matrix a, Matrix b)
-{
-	try
-	{
-		Matrix multiplying = multiplying.multiplyMatrixes(a, b);
-		return multiplying;
-	}
-	catch (std::exception& e)
-	{
-		std::cout << e.what() << std::endl;
-	}
-}
-
-
-Matrix Matrix::multiplyMatrixes(Matrix a, Matrix b)
+template<class T>
+Matrix<T> Matrix<T>::multiplyMatrixes(Matrix<T> a, Matrix<T> b)
 {
 
 	if (a.columns != b.rows)
@@ -100,15 +87,15 @@ Matrix Matrix::multiplyMatrixes(Matrix a, Matrix b)
 
 	int arwos = a.rows;
 	int acolumns = b.columns;
-	Matrix a_matrix(arwos, acolumns);
-	std::vector<std::vector <double>> adata;
-	for (int i = 0; i<a.rows; i++)
+	Matrix<T> a_matrix(arwos, acolumns);
+	std::vector<std::vector <T>> adata;
+	for (int i = 0; i < a.rows; i++)
 	{
 		std::vector <double> dataRow;
-		for (int j = 0; j<b.columns; j++)
+		for (int j = 0; j < b.columns; j++)
 		{
 			double sum = 0;
-			for (int k = 0; k <b.rows ; ++k)
+			for (int k = 0; k < b.rows; ++k)
 			{
 				sum += a.data[i][k] * b.data[k][j];
 			}
@@ -122,8 +109,8 @@ Matrix Matrix::multiplyMatrixes(Matrix a, Matrix b)
 	return  a_matrix;
 }
 
-
-class Matrix Matrix::subtractThem(Matrix a, Matrix b)
+template<class T>
+ Matrix<T> Matrix<T>::subtractThem(Matrix<T> a, Matrix<T> b)
 {
 	try
 	{
@@ -136,11 +123,12 @@ class Matrix Matrix::subtractThem(Matrix a, Matrix b)
 	}
 }
 
-Matrix Matrix::addthem(Matrix a, Matrix b)
+template<class T>
+Matrix<T> Matrix<T>::addthem(Matrix<T> a, Matrix<T> b)
 {
 	try
 	{
-		Matrix adding =adding.addMatrices(a, b);
+		Matrix<T> adding = adding.addMatrices(a, b);
 		return adding;
 	}
 	catch (std::exception& e)
@@ -149,8 +137,8 @@ Matrix Matrix::addthem(Matrix a, Matrix b)
 	}
 }
 
-
-class Matrix Matrix::subtractMatrices(Matrix a, Matrix b)
+template<class T>
+Matrix<T> Matrix<T>::subtractMatrices(Matrix<T> a, Matrix<T> b)
 {
 	if (a.rows != b.rows || a.columns != b.columns)
 	{
@@ -159,12 +147,12 @@ class Matrix Matrix::subtractMatrices(Matrix a, Matrix b)
 
 	int arwos = a.rows;
 	int acolumns = a.columns;
-	Matrix a_matrix(arwos, acolumns);
-	std::vector<std::vector <double>> adata;
-	for (int i = 0; i<arwos; i++)
+	Matrix<T> a_matrix(arwos, acolumns);
+	std::vector<std::vector <T>> adata;
+	for (int i = 0; i < arwos; i++)
 	{
-		std::vector <double> dataRow;
-		for (int j = 0; j<acolumns; j++)
+		std::vector <T> dataRow;
+		for (int j = 0; j < acolumns; j++)
 		{
 			dataRow.push_back(a.data[i][j] - b.data[i][j]);
 		}
@@ -176,8 +164,8 @@ class Matrix Matrix::subtractMatrices(Matrix a, Matrix b)
 	return  a_matrix;
 }
 
-
-Matrix Matrix::addMatrices(Matrix a, Matrix b)
+template<class T>
+Matrix<T> Matrix<T>::addMatrices(Matrix<T> a, Matrix<T> b)
 {
 	if (a.rows != b.rows || a.columns != b.columns)
 	{
@@ -186,12 +174,12 @@ Matrix Matrix::addMatrices(Matrix a, Matrix b)
 
 	int arwos = a.rows;
 	int acolumns = a.columns;
-	Matrix a_matrix(arwos, acolumns);
-	std::vector<std::vector <double>> adata;
-	for (int i = 0; i<arwos; i++)
+	Matrix<T> a_matrix(arwos, acolumns);
+	std::vector<std::vector <T>> adata;
+	for (int i = 0; i < arwos; i++)
 	{
-		std::vector <double> dataRow;
-		for (int j = 0; j<acolumns; j++)
+		std::vector <T> dataRow;
+		for (int j = 0; j < acolumns; j++)
 		{
 			dataRow.push_back(a.data[i][j] + b.data[i][j]);
 		}
@@ -202,8 +190,8 @@ Matrix Matrix::addMatrices(Matrix a, Matrix b)
 	a_matrix.columns = acolumns;
 	return  a_matrix;
 }
-
-void Matrix::writeMatrixToFile(std::string fileName)
+template<class T>
+void Matrix<T>::writeMatrixToFile(std::string fileName)
 {
 	std::ofstream outputFile(fileName);
 	if (!outputFile.is_open())
@@ -219,10 +207,10 @@ void Matrix::writeMatrixToFile(std::string fileName)
 	}
 }
 
-
-std::vector<double> convert_string_to_vector(std::string input)
+template<class T>
+std::vector<T> convert_string_to_vector(std::string input)
 {
-	std::vector<double> vecNumbers;
+	std::vector<T> vecNumbers;
 	std::stringstream ss(input);
 	std::string indvString;
 	char sper = ';';
@@ -233,9 +221,10 @@ std::vector<double> convert_string_to_vector(std::string input)
 	return vecNumbers;
 }
 
-Matrix::Matrix(std::string filename)
+template<class T>
+Matrix<T>::Matrix(std::string filename)
 {
-	std::vector<std::vector <double>> dataman;
+	std::vector<std::vector <T>> dataman;
 	std::ifstream inputFile(filename);
 	if (!inputFile.is_open())
 		throw std::exception("No such file");
@@ -252,17 +241,17 @@ Matrix::Matrix(std::string filename)
 	this->columns = dataman[0].size();
 
 }
-
-void Matrix::transposition()
+template<class T>
+void Matrix<T>::transposition()
 {
 	int trows = this->columns;
 	int tcolumns = this->rows;
 	int a = this->rows - 1;
-	std::vector<std::vector <double>> tdata;
-	for (int i = 0; i<trows; i++)
+	std::vector<std::vector <T>> tdata;
+	for (int i = 0; i < trows; i++)
 	{
-		std::vector <double> dataRow;
-		for (int j = 0; j<tcolumns; j++)
+		std::vector <T> dataRow;
+		for (int j = 0; j < tcolumns; j++)
 		{
 			dataRow.push_back(0);
 		}
@@ -279,8 +268,8 @@ void Matrix::transposition()
 	data = tdata;
 }
 
-
-std::string Matrix::getRow(int row)
+template<class T>
+std::string Matrix<T>::getRow(int row)
 {
 	std::stringstream ss;
 	for (int i = 0; i < this->columns; ++i)
@@ -290,8 +279,8 @@ std::string Matrix::getRow(int row)
 	return ss.str();
 }
 
-
-std::string Matrix::getColumn(int column)
+template<class T>
+std::string Matrix<T>::getColumn(int column)
 {
 	std::stringstream ss;
 	for (int i = 0; i < this->rows; ++i)
@@ -300,14 +289,14 @@ std::string Matrix::getColumn(int column)
 	}
 	return ss.str();
 }
-
-std::string Matrix::getSelectedCell(int row, int column)
+template<class T>
+std::string Matrix<T>::getSelectedCell(int row, int column)
 {
 	return std::to_string(data[row][column]);
 }
 
-
-std::string Matrix::getMatrix()
+template<class T>
+std::string Matrix<T>::getMatrix()
 {
 	std::stringstream ss;
 	for (int i = 0; i < this->rows; i++) {
@@ -319,8 +308,8 @@ std::string Matrix::getMatrix()
 	return ss.str();
 }
 
-
-void Matrix::addNumber(int value)
+template<class T>
+void Matrix<T>::addNumber(T value)
 {
 	for (int i = 0; i < this->rows; i++) {
 		for (int j = 0; j < this->columns; j++) {
@@ -329,21 +318,21 @@ void Matrix::addNumber(int value)
 	}
 }
 
-
-void Matrix::changeSelectedCell(int row, int column, double newValue)
+template<class T>
+void Matrix<T>::changeSelectedCell(int row, int column, T newValue)
 {
 	data[row][column] = newValue;
 }
 
-
-Matrix::Matrix(int rows, int columns)
+template<class T>
+Matrix<T>::Matrix(int rows, int columns)
 {
 	this->rows = rows;
 	this->columns = columns;
-	for (int i = 0; i<rows; i++)
+	for (int i = 0; i < rows; i++)
 	{
-		std::vector <double> dataRow;
-		for (int j = 0; j<columns; j++)
+		std::vector <T> dataRow;
+		for (int j = 0; j < columns; j++)
 		{
 			dataRow.push_back(0);
 		}
@@ -354,16 +343,12 @@ Matrix::Matrix(int rows, int columns)
 
 
 int main()
-{
-	Matrix one = Matrix(5, 5);
-	one.addNumber(7);
-	std::cout << one.getMatrix();
-	int box[2] = { 1,2 };
-	int pud[2] = { 3,6 };
-	std::swap(box, pud);
-	std::cout << pud[0];
+{	
+	Matrix<double> checking = Matrix<double>(5, 5);
+	Matrix<double> test = Matrix<double>("test.txt");
+	std::cout << test.getMatrix();
+	
 	getchar();
 
 	return 0;
 }
-
