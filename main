@@ -1,0 +1,369 @@
+// polab06.cpp : Defines the entry point for the console application.
+//
+
+#include "stdafx.h"
+#include <string>
+#include <vector>
+#include <iostream>
+#include <sstream>
+#include <fstream>
+#include <istream>
+#include <filesystem>
+#include <algorithm>
+
+class Matrix
+{
+public:
+	Matrix(int rows, int columns);
+	Matrix(std::string filename);
+	void addNumber(int value);
+	void changeSelectedCell(int row, int column, double newValue);
+	std::string getSelectedCell(int row, int column);
+	std::string getRow(int row);
+	std::string getColumn(int column);
+	std::string getMatrix();
+	void writeMatrixToFile(std::string FileName);
+	void transposition();
+	Matrix addMatrices(Matrix a, Matrix b);
+	Matrix subtractMatrices(Matrix a, Matrix b);
+	Matrix multiplyMatrixes(Matrix, Matrix);
+	Matrix addthem(Matrix, Matrix);
+	Matrix subtractThem(Matrix, Matrix);
+	Matrix multiplyThem(Matrix, Matrix);
+	friend void swap(Matrix& first, Matrix& second)
+	{
+		std::swap(first.columns, second.columns);
+		std::swap(first.rows, second.rows);
+		std::swap(first.data, second.data);
+	}
+	
+	friend Matrix operator+(const Matrix& one, const Matrix& two)
+	{
+		Matrix result(one.rows, one.columns);
+		result = result.addMatrices(one, two);
+		return result;
+	}
+	friend Matrix operator-(const Matrix& one, const Matrix& two)
+	{
+		Matrix result(one.rows, one.columns);
+		result = result.subtractMatrices(one, two);
+		return result;
+	}
+	friend Matrix operator*(const Matrix& one, const Matrix& two)
+	{
+		Matrix result(one.rows, two.columns);
+		result = result.multiplyMatrixes(one, two);
+		return result;
+	}
+	friend Matrix operator~(const Matrix& one)
+	{
+		Matrix resutl = Matrix(one.rows, one.columns);
+		resutl = resutl + one;
+		resutl.transposition();
+		return resutl;
+	}
+	Matrix& operator=(Matrix source)
+	{
+		std::swap(*this, source);
+		return *this;
+	}
+private:
+	int rows;
+	int columns;
+	std::vector<std::vector <double>> data;
+};
+
+
+
+
+class Matrix Matrix::multiplyThem(Matrix a, Matrix b)
+{
+	try
+	{
+		Matrix multiplying = multiplying.multiplyMatrixes(a, b);
+		return multiplying;
+	}
+	catch (std::exception& e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+}
+
+
+Matrix Matrix::multiplyMatrixes(Matrix a, Matrix b)
+{
+
+	if (a.columns != b.rows)
+	{
+		throw std::exception("Matrices do not match each other.");
+	}
+
+	int arwos = a.rows;
+	int acolumns = b.columns;
+	Matrix a_matrix(arwos, acolumns);
+	std::vector<std::vector <double>> adata;
+	for (int i = 0; i<a.rows; i++)
+	{
+		std::vector <double> dataRow;
+		for (int j = 0; j<b.columns; j++)
+		{
+			double sum = 0;
+			for (int k = 0; k <b.rows ; ++k)
+			{
+				sum += a.data[i][k] * b.data[k][j];
+			}
+			dataRow.push_back(sum);
+		}
+		adata.push_back(dataRow);
+	}
+	a_matrix.data = adata;
+	a_matrix.rows = arwos;
+	a_matrix.columns = acolumns;
+	return  a_matrix;
+}
+
+
+class Matrix Matrix::subtractThem(Matrix a, Matrix b)
+{
+	try
+	{
+		Matrix subtracting = subtracting.subtractMatrices(a, b);
+		return subtracting;
+	}
+	catch (std::exception& e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+}
+
+Matrix Matrix::addthem(Matrix a, Matrix b)
+{
+	try
+	{
+		Matrix adding =adding.addMatrices(a, b);
+		return adding;
+	}
+	catch (std::exception& e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+}
+
+
+class Matrix Matrix::subtractMatrices(Matrix a, Matrix b)
+{
+	if (a.rows != b.rows || a.columns != b.columns)
+	{
+		throw std::exception("Matrices do not match each other.");
+	}
+
+	int arwos = a.rows;
+	int acolumns = a.columns;
+	Matrix a_matrix(arwos, acolumns);
+	std::vector<std::vector <double>> adata;
+	for (int i = 0; i<arwos; i++)
+	{
+		std::vector <double> dataRow;
+		for (int j = 0; j<acolumns; j++)
+		{
+			dataRow.push_back(a.data[i][j] - b.data[i][j]);
+		}
+		adata.push_back(dataRow);
+	}
+	a_matrix.data = adata;
+	a_matrix.rows = arwos;
+	a_matrix.columns = acolumns;
+	return  a_matrix;
+}
+
+
+Matrix Matrix::addMatrices(Matrix a, Matrix b)
+{
+	if (a.rows != b.rows || a.columns != b.columns)
+	{
+		throw std::exception("Matrices do not match each other.");
+	}
+
+	int arwos = a.rows;
+	int acolumns = a.columns;
+	Matrix a_matrix(arwos, acolumns);
+	std::vector<std::vector <double>> adata;
+	for (int i = 0; i<arwos; i++)
+	{
+		std::vector <double> dataRow;
+		for (int j = 0; j<acolumns; j++)
+		{
+			dataRow.push_back(a.data[i][j] + b.data[i][j]);
+		}
+		adata.push_back(dataRow);
+	}
+	a_matrix.data = adata;
+	a_matrix.rows = arwos;
+	a_matrix.columns = acolumns;
+	return  a_matrix;
+}
+
+void Matrix::writeMatrixToFile(std::string fileName)
+{
+	std::ofstream outputFile(fileName);
+	if (!outputFile.is_open())
+		throw std::exception("Can't write");
+	std::string lineAsString = "";
+	std::stringstream ss;
+	for (int i = 0; i < this->rows; i++) {
+		for (int j = 0; j < this->columns; j++) {
+			lineAsString += std::to_string(data[i][j]) + ";";
+		}
+		outputFile << lineAsString << std::endl;
+		lineAsString = "";
+	}
+}
+
+
+std::vector<double> convert_string_to_vector(std::string input)
+{
+	std::vector<double> vecNumbers;
+	std::stringstream ss(input);
+	std::string indvString;
+	char sper = ';';
+
+	while (getline(ss, indvString, sper)) {
+		vecNumbers.push_back(stod(indvString));
+	}
+	return vecNumbers;
+}
+
+Matrix::Matrix(std::string filename)
+{
+	std::vector<std::vector <double>> dataman;
+	std::ifstream inputFile(filename);
+	if (!inputFile.is_open())
+		throw std::exception("No such file");
+	bool we_use_string = true;
+	if (we_use_string) {
+		std::string lineAsString;
+		while (!inputFile.eof()) {
+			inputFile >> lineAsString;
+			dataman.push_back(convert_string_to_vector(lineAsString));
+		}
+	}
+	this->data = dataman;
+	this->rows = dataman.size();
+	this->columns = dataman[0].size();
+
+}
+
+void Matrix::transposition()
+{
+	int trows = this->columns;
+	int tcolumns = this->rows;
+	int a = this->rows - 1;
+	std::vector<std::vector <double>> tdata;
+	for (int i = 0; i<trows; i++)
+	{
+		std::vector <double> dataRow;
+		for (int j = 0; j<tcolumns; j++)
+		{
+			dataRow.push_back(0);
+		}
+		tdata.push_back(dataRow);
+	}
+	for (int i = 0; i < tcolumns; i++) {
+		for (int j = 0; j < trows; j++) {
+			tdata[j][a] = data[a][j];
+		}
+		a--;
+	}
+	this->rows = trows;
+	this->columns = tcolumns;
+	data = tdata;
+}
+
+
+std::string Matrix::getRow(int row)
+{
+	std::stringstream ss;
+	for (int i = 0; i < this->columns; ++i)
+	{
+		std::cout << std::to_string(data[row][i]) + " ";
+	}
+	return ss.str();
+}
+
+
+std::string Matrix::getColumn(int column)
+{
+	std::stringstream ss;
+	for (int i = 0; i < this->rows; ++i)
+	{
+		ss << std::to_string(data[i][column]) + "\n";
+	}
+	return ss.str();
+}
+
+std::string Matrix::getSelectedCell(int row, int column)
+{
+	return std::to_string(data[row][column]);
+}
+
+
+std::string Matrix::getMatrix()
+{
+	std::stringstream ss;
+	for (int i = 0; i < this->rows; i++) {
+		for (int j = 0; j < this->columns; j++) {
+			ss << std::to_string(data[i][j]) + " ";
+		}
+		ss << "\n";
+	}
+	return ss.str();
+}
+
+
+void Matrix::addNumber(int value)
+{
+	for (int i = 0; i < this->rows; i++) {
+		for (int j = 0; j < this->columns; j++) {
+			this->data[i][j] += value;
+		}
+	}
+}
+
+
+void Matrix::changeSelectedCell(int row, int column, double newValue)
+{
+	data[row][column] = newValue;
+}
+
+
+Matrix::Matrix(int rows, int columns)
+{
+	this->rows = rows;
+	this->columns = columns;
+	for (int i = 0; i<rows; i++)
+	{
+		std::vector <double> dataRow;
+		for (int j = 0; j<columns; j++)
+		{
+			dataRow.push_back(0);
+		}
+		data.push_back(dataRow);
+	}
+}
+
+
+
+int main()
+{
+	Matrix one = Matrix(5, 5);
+	one.addNumber(7);
+	std::cout << one.getMatrix();
+	int box[2] = { 1,2 };
+	int pud[2] = { 3,6 };
+	std::swap(box, pud);
+	std::cout << pud[0];
+	getchar();
+
+	return 0;
+}
+
