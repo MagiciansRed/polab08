@@ -1,7 +1,7 @@
-// polab08.cpp : Ten plik zawiera funkcję „main”. W nim rozpoczyna się i kończy wykonywanie programu.
+// polab06.cpp : Defines the entry point for the console application.
 //
 
-#include "pch.h"
+#include "stdafx.h"
 #include <string>
 #include <vector>
 #include <iostream>
@@ -45,6 +45,22 @@ public:
 		result = result.addMatrices(one, two);
 		return result;
 	}
+	 Matrix& operator+=(const Matrix source)
+	{
+		Matrix result(source.rows, source.columns);
+		result = result.addMatrices(*this, source);
+		swap(*this, result);
+		return *this;
+	}
+
+	 Matrix& operator*=(const Matrix source)
+	 {
+		 Matrix result(source.rows, source.columns);
+		 result = result.multiplyMatrixes(*this, source);
+		 swap(*this, result);
+		 return *this;
+	 }
+
 	friend Matrix operator-(const Matrix& one, const Matrix& two)
 	{
 		Matrix result(one.rows, one.columns);
@@ -72,7 +88,7 @@ public:
 private:
 	int rows;
 	int columns;
-	std::vector<std::vector <double>> data;
+	std::vector<std::vector <T>> data;
 };
 
 
@@ -91,10 +107,10 @@ Matrix<T> Matrix<T>::multiplyMatrixes(Matrix<T> a, Matrix<T> b)
 	std::vector<std::vector <T>> adata;
 	for (int i = 0; i < a.rows; i++)
 	{
-		std::vector <double> dataRow;
+		std::vector <T> dataRow;
 		for (int j = 0; j < b.columns; j++)
 		{
-			double sum = 0;
+			T sum = 0;
 			for (int k = 0; k < b.rows; ++k)
 			{
 				sum += a.data[i][k] * b.data[k][j];
@@ -110,7 +126,7 @@ Matrix<T> Matrix<T>::multiplyMatrixes(Matrix<T> a, Matrix<T> b)
 }
 
 template<class T>
- Matrix<T> Matrix<T>::subtractThem(Matrix<T> a, Matrix<T> b)
+Matrix<T> Matrix<T>::subtractThem(Matrix<T> a, Matrix<T> b)
 {
 	try
 	{
@@ -216,7 +232,7 @@ std::vector<T> convert_string_to_vector(std::string input)
 	char sper = ';';
 
 	while (getline(ss, indvString, sper)) {
-		vecNumbers.push_back(stod(indvString));
+		vecNumbers.push_back((T) indvString);
 	}
 	return vecNumbers;
 }
@@ -233,7 +249,15 @@ Matrix<T>::Matrix(std::string filename)
 		std::string lineAsString;
 		while (!inputFile.eof()) {
 			inputFile >> lineAsString;
-			dataman.push_back(convert_string_to_vector(lineAsString));
+			std::vector<T> vecNumbers;
+			std::stringstream ss(lineAsString);
+			std::string indvString;
+			char sper = ';';
+
+			while (getline(ss, indvString, sper)) {
+				vecNumbers.push_back(stod(indvString));
+			}
+			dataman.push_back(vecNumbers);
 		}
 	}
 	this->data = dataman;
@@ -343,12 +367,19 @@ Matrix<T>::Matrix(int rows, int columns)
 
 
 int main()
-{	
-	Matrix<double> checking = Matrix<double>(5, 5);
-	Matrix<double> test = Matrix<double>("test.txt");
+{
+	Matrix<float> checking = Matrix<float>(3,5);
+	Matrix<float> test = Matrix<float>("test.txt");
+	try {
+		test *= test;
+	}
+	catch (std::exception& e)
+	{
+		std::cout << e.what() << std::endl;
+	}
 	std::cout << test.getMatrix();
-	
 	getchar();
 
 	return 0;
 }
+
